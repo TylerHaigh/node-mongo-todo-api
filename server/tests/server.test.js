@@ -4,7 +4,9 @@ const request = require('supertest');
 const {app} = require('./../server');
 const {Todo} = require('./../models/todo-model');
 
-const initTodos = [{text: 'First todo'}, {text: 'Second todo'}];
+const {ObjectID} = require('mongodb');
+
+const initTodos = [{text: 'First todo', _id: new ObjectID() }, {text: 'Second todo', _id: new ObjectID()}];
 
 
 beforeEach( (done) => {
@@ -69,3 +71,33 @@ describe('GET /todos', () => {
 
 
 });
+
+
+describe ('GET /todos/id', () => {
+
+    it ('should get valid', (done) => {
+        request(app)
+            .get(`/todos/${initTodos[0]._id.toHexString()}`)
+            .expect(200)
+            .expect( (res) => {
+                expect(res.body.todo.text).toBe(initTodos[0].text)
+            }).end(done)
+    })
+
+    it ('should return 404 for invalid ID', (done) => {
+        var newId = '123'
+        request(app)
+            .get(`/todos/${newId}`)
+            .expect(404)
+            .end(done)
+    })
+
+    it ('should return 404 for non-existing ID', (done) => {
+        var newId = new ObjectID().toHexString();
+        request(app)
+            .get(`/todos/${newId}`)
+            .expect(404)
+            .end(done)
+    })
+
+})

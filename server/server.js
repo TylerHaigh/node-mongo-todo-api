@@ -5,6 +5,8 @@ const { Todo, User } = require('./models/models');
 const express = require('express');
 const bodyParser = require('body-parser');
 
+const {ObjectID} = require('mongodb');
+
 var app = express();
 
 app.use(bodyParser.json());
@@ -30,7 +32,26 @@ app.get('/todos', (req, res) => {
 });
 
 
-const port = 3000;
+app.get('/todos/:id', (req, res) => {
+    var id = req.params.id;
+    //res.send(req.params);
+
+    if (!ObjectID.isValid(id))
+        return res.status(404).send();
+
+    Todo.findById(id).then( (todo) => {
+        if (!todo)
+            return res.status(404).send();
+        
+        return res.send({todo});
+    }).catch( (e) => res.status(500).send(e) );
+})
+
+
+
+
+
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`Server started on port ${port}`)
 });
