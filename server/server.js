@@ -11,18 +11,22 @@ const _ = require('lodash');
 
 var app = express();
 
+// middleware
 app.use(bodyParser.json());
+
+
+// routes
+
 
 app.post('/todos', (req, res) => {
     var todo = new Todo({text: req.body.text});
 
     todo.save().then( (doc) => {
         res.send(doc);
-    }, (err) => {
+    }).catch((err) => {
         res.status(400).send(err);
-    })
-})
-
+    });
+});
 
 app.get('/todos', (req, res) => {
 
@@ -30,7 +34,7 @@ app.get('/todos', (req, res) => {
         res.send({todos});
     }, (e) => {
         res.status(400).send(e);
-    })
+    });
 });
 
 
@@ -90,6 +94,24 @@ app.patch('/todos/:id', (req, res) => {
         }).catch( (e) => res.status(500).send());
 
 
+});
+
+
+
+app.post('/users', (req, res) => {
+    
+    var body = _.pick(req.body, ['email', 'password']);
+    
+    var user = new User(body);
+
+    user.save().then( () => {
+        return user.generateAuthToken();
+    }).then( (token) => {
+        //res.send(doc);
+        res.header('x-auth', token).send(user);
+    }).catch( (err) => {
+        res.status(400).send(err);
+    });
 });
 
 
