@@ -1,3 +1,4 @@
+const config = require('./config/config');
 
 const {mongoose} = require('./db/mongoose');
 const { Todo, User } = require('./models/models');
