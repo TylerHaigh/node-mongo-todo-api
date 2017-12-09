@@ -9,10 +9,16 @@ const bodyParser = require('body-parser');
 const {ObjectID} = require('mongodb');
 const _ = require('lodash');
 
+const {authenticate} = require('./middleware/authenticate');
+
 var app = express();
 
 // middleware
+
 app.use(bodyParser.json());
+
+
+
 
 
 // routes
@@ -115,6 +121,11 @@ app.post('/users', (req, res) => {
 });
 
 
+
+
+app.get('/users/me', authenticate, (req, res) => {
+    res.send(req.user);
+})
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
