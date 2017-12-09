@@ -116,6 +116,7 @@ app.post('/users', (req, res) => {
         //res.send(doc);
         res.header('x-auth', token).send(user);
     }).catch( (err) => {
+        // console.log(err);
         res.status(400).send(err);
     });
 });
@@ -136,7 +137,7 @@ app.post('/users/login', (req, res) => {
     //res.send(body);
 
     User.findByCredentials(body.email, body.password).then( (user) => {
-        user.generateAuthToken().then( (token) => {
+        return user.generateAuthToken().then( (token) => {
             res.header('x-auth', token).send(user);
         });
     }).catch( (err) => {
@@ -146,7 +147,13 @@ app.post('/users/login', (req, res) => {
 });
 
 
-
+app.delete('/users/me/token', authenticate, (req, res) => {
+    req.user.removeToken(req.token).then( () => {
+        res.status(200).send();
+    }, () => {
+        res.statusCode(400).send();
+    });
+});
 
 
 

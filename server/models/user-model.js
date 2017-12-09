@@ -41,6 +41,9 @@ UserSchema.methods.generateAuthToken = function() {
 
     // https://github.com/Automattic/mongoose/issues/4455
     user.tokens = user.tokens.concat([{access, token}]);
+    //user.tokens = [];
+    //user.tokens.push({access, token});
+
     return user.save().then( () => {
         return token;
     });
@@ -101,6 +104,16 @@ UserSchema.statics.findByCredentials = function(email, password) {
     });
 };
 
+
+UserSchema.methods.removeToken = function(token) {
+    var user = this;
+    
+    return user.update({
+        $pull: {
+            tokens: { token }
+        }
+    })
+}
 
 
 var User = mongoose.model('User', UserSchema);
