@@ -6,7 +6,10 @@ const {Todo} = require('./../models/todo-model');
 
 const {ObjectID} = require('mongodb');
 
-const initTodos = [{text: 'First todo', _id: new ObjectID() }, {text: 'Second todo', _id: new ObjectID()}];
+const initTodos = [
+    {text: 'First todo', _id: new ObjectID() },
+    {text: 'Second todo', _id: new ObjectID(), completed: true, completedAt: 333}
+];
 
 
 beforeEach( (done) => {
@@ -140,6 +143,69 @@ describe('DELETE /todos/id', () => {
 
         request(app)
             .delete(`/todos/${id}`)
+            .expect(404)
+            .end(done);
+    });
+
+});
+
+
+
+describe ('PATCH /todos/id', () => {
+
+    it ('should update if valid id', (done) => {
+
+        var id = initTodos[0]._id.toHexString();
+        var text = 'Updated';
+
+        request(app)
+            .patch(`/todos/${id}`)
+            .send({
+                completed: true,
+                text
+            })
+            .expect(200)
+            .expect( (res) => {
+                expect(res.body.todo.completed).toBe(true);
+                expect(res.body.todo.completedAt).toBeA('number');
+                expect(res.body.todo.text).toBe(text);
+            }).end(done);
+    });
+
+    it ('should clear data on non-completed', (done) => {
+        var id = initTodos[1]._id.toHexString();
+        var text = 'Updated';
+
+        request(app)
+            .patch(`/todos/${id}`)
+            .send({
+                completed: false,
+                text
+            })
+            .expect(200)
+            .expect( (res) => {
+                expect(res.body.todo.completed).toBe(false);
+                expect(res.body.todo.completedAt).toNotExist();
+                expect(res.body.todo.text).toBe(text);
+            }).end(done);
+    });
+
+    it ('should return 404 if invalid ID', (done) => {
+        var id = new ObjectID().toHexString();
+
+        request(app)
+            .patch(`/todos/${id}`)
+            .send({completed: true})
+            .expect(404)
+            .end(done);
+    });
+
+    it ('should update if non-existing id', (done) => {
+        var id = '123';
+
+        request(app)
+            .patch(`/todos/${id}`)
+            .send({completed: true})
             .expect(404)
             .end(done);
     });
