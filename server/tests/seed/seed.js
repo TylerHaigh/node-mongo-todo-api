@@ -26,7 +26,7 @@ const initUsers = [
         password: 'userOnePass',
         tokens: [{
             access: 'auth',
-            token: jwt.sign({_id: userOneId, access: 'auth'}, '123abc').toString()
+            token: jwt.sign({_id: userOneId, access: 'auth'}, process.env.JWT_SECRET).toString()
         }]
     },
     {
@@ -35,7 +35,7 @@ const initUsers = [
         password: 'userTwoPass',
         tokens: [{
             access: 'auth',
-            token: jwt.sign({_id: userTwoId, access: 'auth'}, '123abc').toString()
+            token: jwt.sign({_id: userTwoId, access: 'auth'}, process.env.JWT_SECRET).toString()
         }]
     },
 ]
