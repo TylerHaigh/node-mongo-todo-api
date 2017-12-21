@@ -9,7 +9,15 @@ if (env === 'development' || env === 'test') {
         process.env[key] = envConfig[key];
     }));
 }
+else if (env === 'travis') {
+    // load config file
+    var config = require('./config.travis.json');
+    var envConfig = config[env];
 
+    Object.keys(envConfig).forEach( (key => {
+        process.env[key] = envConfig[key];
+    }));
+}
 
 // Do this before importing mongoose config file
 // if (env === 'development') {
